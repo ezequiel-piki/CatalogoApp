@@ -30,6 +30,11 @@ namespace negocio
             comandoSQL.CommandText = query;
         }
 
+        public void setProcedure(string sp) {
+            comandoSQL.CommandType = System.Data.CommandType.StoredProcedure;
+            comandoSQL.CommandText = sp;
+        }
+
         public void ejecutarLectura()
         {
             comandoSQL.Connection = conexionSQL;
@@ -54,6 +59,22 @@ namespace negocio
 
                 conexionSQL.Open();
                 comandoSQL.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public int ejecutarAccionScalar()
+        {
+            comandoSQL.Connection = conexionSQL;
+            try
+            {
+
+                conexionSQL.Open();
+                return int.Parse(comandoSQL.ExecuteScalar().ToString()) ;
             }
             catch (Exception)
             {

@@ -67,12 +67,100 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Default.aspx" />
+    <Content Include="DetalleArticulo.aspx" />
+    <Content Include="Error.aspx" />
+    <Content Include="Favoritos.aspx" />
+    <Content Include="FormularioArticulo.aspx" />
+    <Content Include="ListaArticulos.aspx" />
+    <Content Include="Login.aspx" />
+    <Content Include="Registro.aspx" />
+    <Content Include="MenuLogin.aspx" />
+    <Content Include="MiPerfil.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DetalleArticulo.aspx.cs">
+      <DependentUpon>DetalleArticulo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DetalleArticulo.aspx.designer.cs">
+      <DependentUpon>DetalleArticulo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Error.aspx.cs">
+      <DependentUpon>Error.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Error.aspx.designer.cs">
+      <DependentUpon>Error.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Favoritos.aspx.cs">
+      <DependentUpon>Favoritos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Favoritos.aspx.designer.cs">
+      <DependentUpon>Favoritos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FormularioArticulo.aspx.cs">
+      <DependentUpon>FormularioArticulo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FormularioArticulo.aspx.designer.cs">
+      <DependentUpon>FormularioArticulo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ListaArticulos.aspx.cs">
+      <DependentUpon>ListaArticulos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ListaArticulos.aspx.designer.cs">
+      <DependentUpon>ListaArticulos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Registro.aspx.cs">
+      <DependentUpon>Registro.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Registro.aspx.designer.cs">
+      <DependentUpon>Registro.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MenuLogin.aspx.cs">
+      <DependentUpon>MenuLogin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="MenuLogin.aspx.designer.cs">
+      <DependentUpon>MenuLogin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MiMaster.Master.cs">
+      <DependentUpon>MiMaster.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="MiMaster.Master.designer.cs">
+      <DependentUpon>MiMaster.Master</DependentUpon>
+    </Compile>
+    <Compile Include="MiPerfil.aspx.cs">
+      <DependentUpon>MiPerfil.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="MiPerfil.aspx.designer.cs">
+      <DependentUpon>MiPerfil.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="MiMaster.Master" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -90,6 +178,9 @@
       <Project>{7dcd398e-982e-4977-8004-e2bbdd4d73ea}</Project>
       <Name>negocio</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Imagenes\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

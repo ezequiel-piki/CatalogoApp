@@ -8,9 +8,10 @@ using System.Data.SqlClient;
 
 namespace negocio
 {
-   public class ArticuloNegocio
+    public class ArticuloNegocio
     {
-        public List<Articulo> listar() {
+        public List<Articulo> listar(string id = "")
+        {
 
             List<Articulo> listaArticulos = new List<Articulo>();
 
@@ -21,24 +22,28 @@ namespace negocio
             try
             {
                 conexionSQL.ConnectionString = "server=.\\SQLEXPRESS; database=CATALOGO_DB; integrated security=true";
-                comandoSQL.CommandType       = System.Data.CommandType.Text;
-                comandoSQL.CommandText       = "select Codigo, Nombre, Art.Descripcion, ImagenUrl, Marcs.Descripcion AS Marca, Categoris.Descripcion AS Categoria, Precio, Art.IdMarca, Art.IdCategoria, Art.Id from Articulos Art inner join Marcas Marcs on (Art.IdMarca = Marcs.Id) inner join Categorias Categoris on (Art.IdCategoria = Categoris.Id)";
-                comandoSQL.Connection        = conexionSQL;
+                comandoSQL.CommandType = System.Data.CommandType.Text;
+                comandoSQL.CommandText = "select Codigo, Nombre, Art.Descripcion, ImagenUrl, Marcs.Descripcion AS Marca, Categoris.Descripcion AS Categoria, Precio, Art.IdMarca, Art.IdCategoria, Art.Id, Art.Activo from Articulos Art inner join Marcas Marcs on (Art.IdMarca = Marcs.Id) inner join Categorias Categoris on (Art.IdCategoria = Categoris.Id) ";
+
+                if (id != "")
+                    comandoSQL.CommandText += " and Art.Id = " + id;
+
+                comandoSQL.Connection = conexionSQL;
                 conexionSQL.Open();
                 lectorSQL = comandoSQL.ExecuteReader();
 
                 while (lectorSQL.Read())
                 {
-                    Articulo articuloAuxiliar    = new Articulo();
-                    articuloAuxiliar.Id          = (int)lectorSQL["Id"];
-                    articuloAuxiliar.Codigo      = (string)lectorSQL["Codigo"];
-                    articuloAuxiliar.Nombre      = (string)lectorSQL["Nombre"];
+                    Articulo articuloAuxiliar = new Articulo();
+                    articuloAuxiliar.Id = (int)lectorSQL["Id"];
+                    articuloAuxiliar.Codigo = (string)lectorSQL["Codigo"];
+                    articuloAuxiliar.Nombre = (string)lectorSQL["Nombre"];
                     articuloAuxiliar.Descripcion = (string)lectorSQL["Descripcion"];
 
-                   // if(!(lectorSQL.IsDBNull(lectorSQL.GetOrdinal("ImagenUrl"))))
-                   // articuloAuxiliar.ImagenUrl   = (string)lectorSQL["ImagenUrl"];
+                    // if(!(lectorSQL.IsDBNull(lectorSQL.GetOrdinal("ImagenUrl"))))
+                    // articuloAuxiliar.ImagenUrl   = (string)lectorSQL["ImagenUrl"];
 
-                    if(!(lectorSQL["ImagenUrl"] is DBNull))
+                    if (!(lectorSQL["ImagenUrl"] is DBNull))
                         articuloAuxiliar.ImagenUrl = (string)lectorSQL["ImagenUrl"];
 
                     if (!(lectorSQL["Precio"] is DBNull))
@@ -52,11 +57,12 @@ namespace negocio
                     articuloAuxiliar.Categoria.Id = (int)lectorSQL["IdCategoria"];
                     articuloAuxiliar.Categoria.Descripcion = (string)lectorSQL["Categoria"];
 
+                    articuloAuxiliar.Activo = bool.Parse(lectorSQL["Activo"].ToString());
 
                     listaArticulos.Add(articuloAuxiliar);
                 }
                 conexionSQL.Close();
-            return listaArticulos;
+                return listaArticulos;
             }
             catch (Exception ex)
             {
@@ -66,13 +72,109 @@ namespace negocio
 
         }
 
-        public void addArticulo(Articulo articulo) {
+        public List<Articulo> listarConSP()
+        {
+
+            List<Articulo> lista = new List<Articulo>();
+            AccesoDatos data = new AccesoDatos();
+            try
+            {
+
+                data.setProcedure("storeListar");
+                data.ejecutarLectura();
+
+                while (data.LectorSQL.Read())
+                {
+                    Articulo articuloAuxiliar = new Articulo();
+                    articuloAuxiliar.Id = (int)data.LectorSQL["Id"];
+                    articuloAuxiliar.Codigo = (string)data.LectorSQL["Codigo"];
+                    articuloAuxiliar.Nombre = (string)data.LectorSQL["Nombre"];
+                    articuloAuxiliar.Descripcion = (string)data.LectorSQL["Descripcion"];
+
+                    if (!(data.LectorSQL["ImagenUrl"] is DBNull))
+                        articuloAuxiliar.ImagenUrl = (string)data.LectorSQL["ImagenUrl"];
+
+                    if (!(data.LectorSQL["Precio"] is DBNull))
+                        articuloAuxiliar.Precio = decimal.Parse(data.LectorSQL["Precio"].ToString());
+
+
+                    articuloAuxiliar.Marca = new Marca();
+                    articuloAuxiliar.Marca.Id = (int)data.LectorSQL["IdMarca"];
+                    articuloAuxiliar.Marca.Descripcion = (string)data.LectorSQL["Marca"];
+                    articuloAuxiliar.Categoria = new Categoria();
+                    articuloAuxiliar.Categoria.Id = (int)data.LectorSQL["IdCategoria"];
+                    articuloAuxiliar.Categoria.Descripcion = (string)data.LectorSQL["Categoria"];
+
+                    articuloAuxiliar.Activo = bool.Parse(data.LectorSQL["Activo"].ToString());
+
+
+                    lista.Add(articuloAuxiliar);
+                }
+
+                return lista;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public void updateArticuloConStoreProcedure(Articulo articulo)
+        {
+            AccesoDatos data = new AccesoDatos();
+            try
+            {
+                data.setProcedure("storedModifcarArticulo");
+                data.setearParametro("@codigo", articulo.Codigo);
+                data.setearParametro("@nombre", articulo.Nombre);
+                data.setearParametro("@desc", articulo.Descripcion);
+                data.setearParametro("@idMarca", articulo.Marca.Id);
+                data.setearParametro("@idCategoria", articulo.Categoria.Id);
+                data.setearParametro("@img", articulo.ImagenUrl);
+                data.setearParametro("@precio", articulo.Precio);
+                data.setearParametro("@id", articulo.Id);
+
+                data.ejecutarAccion();
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                data.cerrarConexion();
+            }
+        }
+
+        public void eliminarLogico(int id, bool activo = false)
+        {
+            try
+            {
+                AccesoDatos data = new AccesoDatos();
+                data.setQuery("update Articulos set Activo = @activo where id = @id");
+                data.setearParametro("@id", id);
+                data.setearParametro("@activo",activo);
+                data.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public void addArticulo(Articulo articulo)
+        {
             AccesoDatos data = new AccesoDatos();
 
             try
             {
-                data.setQuery("Insert into ARTICULOS (Codigo, Nombre, Descripcion, IdMarca, IdCategoria, ImagenUrl, Precio) values ('"+articulo.Codigo+"','"+articulo.Nombre+"','"+articulo.Descripcion+"', @idMarca, @idCategoria, @imagenUrl, @precio)");
-                data.setearParametro("@idMarca",articulo.Marca.Id);
+                data.setQuery("Insert into ARTICULOS (Codigo, Nombre, Descripcion, IdMarca, IdCategoria, ImagenUrl, Precio) values ('" + articulo.Codigo + "','" + articulo.Nombre + "','" + articulo.Descripcion + "', @idMarca, @idCategoria, @imagenUrl, @precio)");
+                data.setearParametro("@idMarca", articulo.Marca.Id);
                 data.setearParametro("@idCategoria", articulo.Categoria.Id);
                 data.setearParametro("@imagenUrl", articulo.ImagenUrl);
                 data.setearParametro("@precio", articulo.Precio);
@@ -88,7 +190,36 @@ namespace negocio
                 data.cerrarConexion();
             }
         }
-        public void updateArticulo(Articulo articulo) {
+
+        public void addArticuloConStoreProcedure(Articulo articulo)
+        {
+            AccesoDatos data = new AccesoDatos();
+
+            try
+            {
+                data.setProcedure("storedAltaArticulo");
+                data.setearParametro("@codigo", articulo.Codigo);
+                data.setearParametro("@nombre", articulo.Nombre);
+                data.setearParametro("@desc", articulo.Descripcion);
+                data.setearParametro("@idMarca", articulo.Marca.Id);
+                data.setearParametro("@idCategoria", articulo.Categoria.Id);
+                data.setearParametro("@img", articulo.ImagenUrl);
+                data.setearParametro("@precio", articulo.Precio);
+                data.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                data.cerrarConexion();
+            }
+        }
+
+        public void updateArticulo(Articulo articulo)
+        {
             AccesoDatos data = new AccesoDatos();
             try
             {
@@ -110,31 +241,32 @@ namespace negocio
             {
 
                 throw ex;
-            }finally
+            }
+            finally
             {
                 data.cerrarConexion();
             }
         }
 
-        public List<Articulo> filtrar(string campo, string criterio, string filtro)
+        public List<Articulo> filtrar(string campo, string criterio, string filtro, string estado)
         {
             List<Articulo> lista = new List<Articulo>();
             AccesoDatos data = new AccesoDatos();
             try
             {
-                string query = "select Codigo, Nombre, Art.Descripcion, ImagenUrl, Marcs.Descripcion AS Marca, Categoris.Descripcion AS Categoria, Precio, Art.IdMarca, Art.IdCategoria, Art.Id from Articulos Art inner join Marcas Marcs on (Art.IdMarca = Marcs.Id) inner join Categorias Categoris on (Art.IdCategoria = Categoris.Id) And ";
+                string query = "select Codigo, Nombre, Art.Descripcion, ImagenUrl, Marcs.Descripcion AS Marca, Categoris.Descripcion AS Categoria, Precio, Art.IdMarca, Art.IdCategoria, Art.Id, Art.Activo from Articulos Art inner join Marcas Marcs on (Art.IdMarca = Marcs.Id) inner join Categorias Categoris on (Art.IdCategoria = Categoris.Id) And ";
                 if (campo == "Precio")
                 {
                     switch (criterio)
                     {
                         case "Mayor a":
-                           query += "Precio > " + filtro;
+                            query += "Precio > " + filtro;
                             break;
                         case "Menor a":
                             query += "Precio < " + filtro;
                             break;
                         default:
-                           query += "Precio = " + filtro;
+                            query += "Precio = " + filtro;
                             break;
                     }
                 }
@@ -153,18 +285,18 @@ namespace negocio
                             break;
                     }
                 }
-                else if (campo == "Código")
+                else if (campo == "Marca")
                 {
                     switch (criterio)
                     {
                         case "Comienza con":
-                            query += "Codigo like '" + filtro + "%' ";
+                            query += "Marcs.Descripcion like '" + filtro + "%' ";
                             break;
                         case "Termina con":
-                            query += "Codigo like '%" + filtro + "'";
+                            query += "Marcs.Descripcion like '%" + filtro + "'";
                             break;
                         default:
-                            query += "Codigo like '%" + filtro + "%'";
+                            query += "Marcs.Descripcion like '%" + filtro + "%'";
                             break;
                     }
                 }
@@ -173,16 +305,21 @@ namespace negocio
                     switch (criterio)
                     {
                         case "Comienza con":
-                            query += "Art.Descripcion like '" + filtro + "%' ";
+                            query += "Categoris.Descripcion like '" + filtro + "%' ";
                             break;
                         case "Termina con":
-                            query += "Art.Descripcion like '%" + filtro + "'";
+                            query += "Categoris.Descripcion like '%" + filtro + "'";
                             break;
                         default:
-                            query += "Art.Descripcion like '%" + filtro + "%'";
+                            query += "Categoris.Descripcion like '%" + filtro + "%'";
                             break;
                     }
                 }
+
+                if (estado == "Activo")
+                    query += " and Art.Activo = 1";
+                else if (estado == "Inactivo")
+                    query += "and Art.Activo = 0";
 
                 data.setQuery(query);
                 data.ejecutarLectura();
@@ -209,6 +346,8 @@ namespace negocio
                     articuloAuxiliar.Categoria.Id = (int)data.LectorSQL["IdCategoria"];
                     articuloAuxiliar.Categoria.Descripcion = (string)data.LectorSQL["Categoria"];
 
+                    articuloAuxiliar.Activo = bool.Parse(data.LectorSQL["Activo"].ToString());
+
 
                     lista.Add(articuloAuxiliar);
                 }
@@ -222,7 +361,8 @@ namespace negocio
             }
         }
 
-        public void eliminar(int id) {
+        public void eliminar(int id)
+        {
 
             try
             {

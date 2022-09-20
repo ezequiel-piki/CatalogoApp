@@ -25,5 +25,6 @@ namespace dominio
         public Categoria  Categoria { get; set; }
         public string ImagenUrl { get; set; }
         public decimal Precio { get; set; }
+        public bool Activo { get; set; }
     }
 }
